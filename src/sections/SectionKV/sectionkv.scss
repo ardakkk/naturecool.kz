@@ -1,0 +1,100 @@
+@import "../../styles/variables.scss";
+.page-main{
+  .section-kv {
+    min-height: 57vw;
+    max-height: calc(100vh - 100px);
+  }
+}
+.section-kv {
+  min-height: auto;
+  position: relative;
+  max-height: calc(100vh - 100px);
+  overflow: hidden;
+  Button{
+  display: inline-block;
+  background-color: $colorgreen;
+  border-bottom: 2px solid $colorgreendark;
+  padding: .7rem 2.2rem;
+  color: $colorwhite;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  font-size: 1rem;
+  border-right: none;
+  border-left::none;
+  border-top:none;
+  span {
+    position: relative;
+    z-index: 34343;
+  }
+
+  &::before {
+    content: "";
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    height: 0;
+    z-index: 0;
+    transition: 350ms all linear;
+  }
+
+  &:hover {
+    border-bottom: 2px solid $colorgreenbutton;
+
+    &::before {
+      height: 100%;
+      background: $colorgreenlight;
+    }
+  }
+
+  &.disabled {
+    color: $colorwhite;
+    background-color: $colorgreybutton;
+    border-bottom: 2px solid $colorgreyborder;
+
+    &:hover {
+      &::before {
+        height: 0;
+      }
+    }
+  }
+}
+  .bg {
+    width: 100%;
+    //margin-top: -50px;
+    z-index: -1;
+
+    @media screen and (min-device-aspect-ratio: 1.5652) and (min-width: 768px) {
+      margin-top: -148px;
+    }
+  }
+
+  .key-block {
+    padding: 2rem;
+    position: absolute;
+    top: 2rem;
+    left: 40%;
+    right: 10vw;
+    max-width: 750px;
+    background-color: rgba(255,255,255,.7);
+
+    @media (max-width: 720px){
+      position: static;
+      padding: 2rem 1rem;
+      max-width: 100%;
+    }
+  }
+
+  .fridge {
+    position: absolute;
+    top: 1%;
+    left: 14%;
+    cursor: pointer;
+    height: 85%;
+  }
+
+  .images {
+    position: relative;
+  }
+}

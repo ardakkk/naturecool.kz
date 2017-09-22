@@ -1,0 +1,50 @@
+@import "../../styles/variables.scss";
+
+.Button{
+  display: inline-block;
+  background-color: $colorgreen;
+  border-bottom: 2px solid $colorgreendark;
+  padding: .7rem 2.2rem;
+  color: $colorwhite;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  font-size: 1rem;
+
+  span {
+    position: relative;
+    z-index: 2;
+  }
+
+  &::before {
+    content: "";
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    height: 0;
+    z-index: 0;
+    transition: 350ms all linear;
+  }
+
+  &:hover {
+    border-bottom: 2px solid $colorgreenbutton;
+
+    &::before {
+      height: 100%;
+      background: $colorgreenlight;
+    }
+  }
+
+  &.disabled {
+    color: $colorwhite;
+    background-color: $colorgreybutton;
+    border-bottom: 2px solid $colorgreyborder;
+
+    &:hover {
+      &::before {
+        height: 0;
+      }
+    }
+  }
+}

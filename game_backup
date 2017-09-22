@@ -1,0 +1,396 @@
+<template>
+    <div :class="{Game:true,GameIe:is_ie}">
+        <div class="timer">{{timerText}}</div>
+        <div class="field">
+            <div class="card-row">
+                <div class="card" v-for="(card, count) in cards" v-if="count < 4" @click="onCardClick(card)"
+                     :class="{'flipped': card.isFlipped || card.isFinished}">
+                    <div class="card-front" :style="`background-image:url(${card.image})`"></div>
+                    <div class="card-back" :class="card.coverClass"></div>
+                </div>
+            </div>
+            <div class="card-row">
+                <div class="card" v-for="(card, count) in cards" v-if=" 4 <= count && count < 8 " @click="onCardClick(card)"
+                     :class="{'flipped': card.isFlipped || card.isFinished}">
+                    <div class="card-front" :style="`background-image:url(${card.image})`"></div>
+                    <div class="card-back" :class="card.coverClass"></div>
+                </div>
+            </div>
+            <div class="card-row">
+                <div class="card" v-for="(card, count) in cards" v-if="8 <= count && count < 12" @click="onCardClick(card)"
+                     :class="{'flipped': card.isFlipped || card.isFinished}">
+                    <div class="card-front" :style="`background-image:url(${card.image})`"></div>
+                    <div class="card-back" :class="card.coverClass"></div>
+                </div>
+            </div>
+            <div class="card-row">
+                <div class="card" v-for="(card, count) in cards" v-if=" 12 <= count && count < 16 " @click="onCardClick(card)"
+                     :class="{'flipped': card.isFlipped || card.isFinished}">
+                    <div class="card-front" :style="`background-image:url(${card.image})`"></div>
+                    <div class="card-back" :class="card.coverClass"></div>
+                </div>
+            </div>
+            <div class="overlay inactive" v-if="state === states.INACTIVE">
+                <div class="instruction">
+                    <div class="rules">
+                        <div class="rule">
+                            <div class="rule-icon circled-icon-eye"></div>
+                            <div class="rule-text">Запомните расположение<br>всех парных карт</div>
+                        </div>
+                        <div class="rule">
+                            <div class="rule-icon circled-icon-refresh"></div>
+                            <div class="rule-text">Переворачивайте карточки<br>и находите пары</div>
+                        </div>
+                        <div class="rule">
+                            <div class="rule-icon circled-icon-puzzle"></div>
+                            <div class="rule-text">Найдите все пары за 30 секунд и получите промокод</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <Button class="play" v-on:click="startGame"><span>Играть</span></Button>
+                </div>
+            </div>
+            <div class="overlay fail" v-if="state === states.FAIL">
+                <div class="wrapper">
+                    <div class="title">
+                        Вы не успели найти все пары. Попробуйте еще раз, выиграйте и получите промокод на скидку!
+                    </div>
+                    <Button v-on:click="restartGame"><span>Еще раз</span></Button>
+                </div>
+            </div>
+            <div class="overlay success" v-if="state === states.SUCCESS">
+                <div class="wrapper">
+                    <div class="title">Поздравляем! <br/>Заполните форму для получения промокода</div>
+
+                    <input type="text" placeholder="Фамилия*"
+                           :class="{ 'invalid': $v.registration.surname.$invalid && $v.registration.surname.$dirty}"
+                           v-model.trim="registration.surname"
+                           @input="$v.registration.surname.$touch()">
+
+                    <input type="text" placeholder="Имя*"
+                           :class="{ 'invalid': $v.registration.name.$invalid && $v.registration.name.$dirty}"
+                           v-model.trim="registration.name"
+                           @input="$v.registration.name.$touch()">
+
+                    <input type="email" placeholder="Эл. Почта*"
+                           :class="{ 'invalid': $v.registration.email.$invalid && $v.registration.email.$dirty}"
+                           v-model.trim="registration.email"
+                           @input="$v.registration.email.$touch()">
+
+                    <masked-input
+                            mask="\+7\ (111) 111-11-11"
+                            placeholder="Телефон*"
+                            maxlength="18"
+                            id="phone"
+                            v-model.trim="registration.phoneNumber"
+                            @input="$v.registration.phoneNumber.$touch()"
+                            :class="{ 'invalid': $v.registration.phoneNumber.$invalid && $v.registration.phoneNumber.$dirty }"
+                    />
+
+                    <div class="agreement">
+                        <input type="checkbox" id="agreement" v-model="registration.agreement" vuelidate/>
+                        <label for="agreement">Согласен/на с
+                            <router-link to="/rules">Правилами проведения</router-link>
+                            акции и обработкой данных</label>
+                    </div>
+                    <Button v-on:click="onRegistration" :class="{'disabled': $v.registration.$invalid}">
+                        <span>Получить скидку</span>
+                    </Button>
+                </div>
+            </div>
+            <div class="overlay success" v-if="state === states.SUCCESS_CONFIRM">
+                <div class="wrapper">
+                    <div class="t-text">
+                        Вам на почту отправлен email с промокодом на скидку 5 % для покупки холодильника Bosch <b>Nature</b>Cool. Опубликуйте результаты в соцсетях — пригласите друзей сыграть в «Найди пару»!
+                        <br>
+                    </div>
+
+                    <div class="share">
+                        <a class="icon circled-icon-fb"
+                           href="https://www.facebook.com/BoschHomeKZ"
+                           target="_blank"></a>
+                        <a class="icon circled-icon-vk"
+                           href="https://www.vk.com/boschhomekazakhstan"
+                           target="_blank"></a>
+                        <a class="icon circled-icon-ok"
+                           href="https://ok.ru/boschhomerussia"
+                           target="_blank"></a>
+                    </div>
+                    <a target="_blank" class="underline" href="https://naturecool.kz/rules">Подробнее об акции читайте в правилах</a>
+                </div>
+            </div>
+        </div>
+        <div class="hint">{{hintValue}}</div>
+
+    </div>
+</template>
+<script>
+
+    import MaskedInput from 'vue-masked-input'
+    import {shuffle, phoneValidation, nameValidation} from '../../utils'
+    import CButton from '../Button/Button.vue'
+    import "./game.scss";
+    import {required, minLength, alpha, numeric, email, maxLength} from 'vuelidate/lib/validators'
+
+    import API from '../../api'
+
+    function has3d() {
+        if (!window.getComputedStyle) {
+            return false;
+        }
+
+        var el = document.createElement('p'),
+            has3d,
+            transforms = {
+                'webkitTransform': '-webkit-transform',
+                'OTransform': '-o-transform',
+                'msTransform': '-ms-transform',
+                'MozTransform': '-moz-transform',
+                'transform': 'transform'
+            };
+
+        // Add it to the body to get the computed style.
+        document.body.insertBefore(el, null);
+
+        for (var t in transforms) {
+            if (el.style[t] !== undefined) {
+                el.style[t] = "translate3d(1px,1px,1px)";
+                has3d = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+            }
+        }
+
+        document.body.removeChild(el);
+
+        return
+        (has3d !== undefined && has3d.length > 0 && has3d !== "none");
+    }
+    const CARDS_DATA = [
+        {
+            type: 1,
+            image: require('../../assets/game-1.jpg')
+        },
+        {
+            type: 2,
+            image: require('../../assets/game-2.jpg')
+        },
+        {
+            type: 3,
+            image: require('../../assets/game-3.jpg')
+        },
+        {
+            type: 4,
+            image: require('../../assets/game-4.jpg')
+        },
+        {
+            type: 5,
+            image: require('../../assets/game-5.jpg')
+        },
+        {
+            type: 6,
+            image: require('../../assets/game-6.jpg')
+        },
+        {
+            type: 7,
+            image: require('../../assets/game-7.jpg')
+        },
+        {
+            type: 8,
+            image: require('../../assets/game-8.jpg')
+        }
+    ];
+    function generateCardsStack() {
+        let cardsCopy = () => JSON.parse(JSON.stringify(CARDS_DATA)),
+            cards = cardsCopy().concat(cardsCopy());
+
+        cards = cards.map(card => Object.assign(card, {
+            id: Math.ceil(Math.random() * 1000),
+            isFlipped: false,
+            isFinished: false,
+            coverClass: `cover-${Math.ceil(Math.random() * 2)}`
+        }));
+        //shuffle
+        shuffle(cards);
+        return cards;
+    }
+
+    function secondsToMs(d) {
+        d = Number(d);
+        let m = Math.floor(d % 3600 / 60),
+            s = Math.floor(d % 3600 % 60);
+
+        return `${m}:${('0' + s).slice(-2)}`;
+    }
+
+    const gameStates = {
+        INACTIVE: 'inactive',
+        PREPARE: 'prepare',
+        ACTIVE: 'active',
+        SUCCESS: 'success',
+        SUCCESS_CONFIRM: 'success_confirm',
+        FAIL: 'fail'
+    };
+
+    export default{
+        components: {
+            CButton,
+            MaskedInput,
+        },
+        data(){
+            return {
+                isActive: false,
+                cards: [],
+                inMemory: 0,
+                uncoverTimeout: 5000,
+                failTimeout: 30000,
+                timeLeft: 0,
+                //timers
+                failTimeoutTimer: 0,
+                timeCounterTimer: 0,
+                state: gameStates.INACTIVE,
+                states: (_ => gameStates)(),
+                is_ie: has3d(),
+
+                registration: {
+                    surname: '',
+                    name: '',
+                    email: '',
+                    phoneNumber: '',
+                    agreement: true
+                },
+                pageUrl: window.location.href
+            }
+        },
+        validations: {
+            registration: {
+                name: {
+                    required,
+                    minLength: minLength(3),
+                    nameValidation,
+                },
+                surname: {
+                    required,
+                    minLength: minLength(3),
+                    nameValidation,
+                },
+                email: {
+                    required,
+                    email
+                },
+                phoneNumber: {
+                    required,
+                    phoneValidation,
+                },
+                agreement: {
+                    required
+                }
+            }
+        },
+        computed: {
+            hintValue(){
+                if (this.state === gameStates.ACTIVE) return 'Переворачивайте карточки и находите все пары!';
+                if (this.state === gameStates.PREPARE) return 'Скорее, запоминайте расположение пар!';
+                return '';
+            },
+            timerText(){
+                if (this.state === gameStates.ACTIVE) return secondsToMs(this.timeLeft);
+                else return ' ';
+            }
+        },
+        methods: {
+            onRegistration(){
+                if (!this.$v.registration.$invalid) {
+                    API.user.create(this.registration).then(_ => {
+                        this.state = gameStates.SUCCESS_CONFIRM;
+                    })
+                }
+            },
+            onCardClick(card){
+                if (!this.isActive) return;
+                if (card.isFinished) return;
+                if (this.cards.filter(card => card.isFlipped).length >= 2) return;
+
+                // show card
+                card.isFlipped = true;
+
+                // check second card
+                if (this.inMemory) {
+                    let inMemoryCard = this.cards.find(card => card.id === this.inMemory);
+                    if (inMemoryCard.type === card.type) {
+                        //success handler
+                        console.log('good job!');
+                        inMemoryCard.isFinished = true;
+                        inMemoryCard.isFlipped = false;
+                        card.isFinished = true;
+                        card.isFlipped = false;
+                    }
+                    else {
+                        console.log('meh :(');
+                    }
+                    this.inMemory = 0;
+                    let flippedCards = this.cards.filter(card => card.isFlipped);
+                    if (flippedCards.length >= 2) {
+                        setTimeout(() => {
+                            flippedCards.forEach(card => card.isFlipped = false)
+                        }, 2000)
+                    }
+                }
+                else {
+                    this.inMemory = card.id;
+                }
+
+                //check if game finished
+                if (!this.cards.filter(card => !card.isFinished).length) {
+                    this.finishGameSuccess();
+                }
+            },
+            initGame(){
+                this.inMemory = 0;
+                this.cards = generateCardsStack();
+            },
+            restartGame(){
+                this.initGame();
+                this.startGame();
+            },
+            startGame(){
+                if (this.isActive) return;
+
+                this.isActive = true;
+                this.cards.forEach(card => card.isFlipped = true);
+                this.state = gameStates.PREPARE;
+                setTimeout(_ => {
+                    this.cards.forEach(card => card.isFlipped = false);
+                    this.state = gameStates.ACTIVE;
+                }, this.uncoverTimeout);
+
+                this.timeLeft = (this.failTimeout + this.uncoverTimeout) / 1000;
+                this.timeCounterTimer = setInterval(_ => {
+                    this.timeLeft--
+                }, 1000);
+                this.failTimeoutTimer = setTimeout(_ => {
+                    this.finishGameFail();
+                }, this.failTimeout + this.uncoverTimeout);
+            },
+            finishGameSuccess(){
+                this.state = gameStates.SUCCESS;
+                this.stopGame();
+                this.$emit('gameEvent', {type: 'finish', status: 'success'});
+                setTimeout(() => document.getElementById("phone").classList.remove("invalid"), 100);
+            },
+            finishGameFail(){
+                this.state = gameStates.FAIL;
+                this.stopGame();
+                this.$emit('gameEvent', {type: 'finish', status: 'fail'});
+            },
+            stopGame(){
+                clearTimeout(this.failTimeoutTimer);
+                clearTimeout(this.timeCounterTimer);
+                this.isActive = false;
+            }
+        },
+        mounted(){
+            this.initGame();
+        }
+    }
+</script>
+

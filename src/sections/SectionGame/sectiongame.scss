@@ -1,0 +1,183 @@
+@import "../../styles/variables.scss";
+.t-title--space-zero{
+  padding: 0!important;;
+  margin: 0!important;
+}
+.page--iframe{
+  padding-top: 0!important;
+  .section-game{
+    padding-top: 0!important;
+  }
+}
+.nowr{
+  white-space: nowrap;
+}
+.section-game{
+  padding: 4rem 10vw;
+  Button{
+    display: inline-block;
+    background-color: $colorgreen;
+    border-bottom: 2px solid $colorgreendark;
+    padding: .7rem 2.2rem;
+    color: $colorwhite;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    font-size: 1rem;
+    border-top:none;
+    border-right:none;
+    border-left:none;
+    span {
+      position: relative;
+      z-index: 2;
+    }
+
+    &::before {
+      content: "";
+      bottom: 0;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      height: 0;
+      z-index: 0;
+      transition: 350ms all linear;
+    }
+
+    &:hover {
+      border-bottom: 2px solid $colorgreenbutton;
+
+      &::before {
+        height: 100%;
+        background: $colorgreenlight;
+      }
+    }
+
+    &.disabled {
+      color: $colorwhite;
+      background-color: $colorgreybutton;
+      border-bottom: 2px solid $colorgreyborder;
+
+      &:hover {
+        &::before {
+          height: 0;
+        }
+      }
+    }
+  }
+  .sulpak,{
+    width: 170px;
+  }
+  .technodom{
+    width: 300px;
+    transform: translate(0px, -6px);
+    margin-left: 20px;
+  }
+  .sulpak::focus{
+    border:none;
+    outline:none;
+  }
+  
+
+  .Game {
+    margin: 0.8rem auto 0;
+    width: 480px;
+    max-width: 90%;
+  }
+
+  .game-layout--frame{
+    width: 800px;
+  }
+  .game-layout--frame .info-block{
+    height: 620px;
+  }
+
+  .game-layout {
+    display: flex;
+    flex-direction: row-reverse;
+
+    .Game {
+      /*min-width: 380px;*/
+      flex-shrink: 0;
+    }
+
+    .info-block{
+      display: flex;
+      padding-left: 2rem;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+  .instruction {
+    display: none;
+    padding-top: 4rem;
+    .rules {
+      display: flex;
+      justify-content: space-between;
+
+      .rule {
+        flex-shrink: 0;
+        flex-basis: 33%;
+        padding-right: 2rem;
+
+        &-icon {
+          width: 2.5rem;
+          height: 2.5rem;
+          border: 1px solid black;
+          border-radius: 100px;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 900px){
+    .game-layout{
+      display: block;
+      .info-block{
+        padding-left: 0;
+      }
+    }
+  }
+  @media (max-width: 720px){
+    padding: 2rem 1rem;
+    border-top: 1px solid #E6E6E6;
+
+    .Game {
+      margin-top: 0;
+    }
+    .sulpak{
+      width: 170px;
+    }
+    .technodom{
+      width: 250px;
+      margin-top:20px;
+      margin-left: 0px;
+    }
+
+    .instruction{
+      //display: block;
+
+      .t-title {
+        font-size: 1.5rem;
+      }
+
+      .rules {
+        display: block;
+
+        .rule {
+          display: flex;
+          padding-top: 10px;
+          margin-bottom: 0.5rem;
+
+          &-icon{
+            flex-shrink: 0;
+          }
+          &-text{
+            padding-left: 1rem;
+            padding-top: 10px;
+          }
+        }
+      }
+    }
+  }
+}
